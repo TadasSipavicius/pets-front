@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useQuery } from '@apollo/client';
 import Skeleton from '@material-ui/lab/Skeleton';
-import { Animal } from '../../graphql/types';
+import { AnimalsConnection } from '../../graphql/types';
 import AnimalsList from './AnimalsList';
 import AnimalsTable from './AnimalsTable';
 import { AnimalsViewType } from './ViewSelector';
@@ -11,14 +11,15 @@ import { AnimalsViewType } from './ViewSelector';
 const GET_ANIMALS_QUERY = loader('../../graphql/queries/animal-list.graphql');
 
 interface Response {
-    animals: Animal[];
+    animals: AnimalsConnection;
 }
 
 interface AnimalsListContainerProps {
     viewType: AnimalsViewType;
+    setAnimalsCount: (value: number) => void;
 }
 
-export default function AnimalsListContainer({ viewType }: AnimalsListContainerProps) {
+export default function AnimalsListContainer({ viewType, setAnimalsCount }: AnimalsListContainerProps) {
     const { loading, error, data } = useQuery<Response>(GET_ANIMALS_QUERY);
     if (loading) {
         return <Skeleton animation="wave" variant="rect" height={500} />;
@@ -29,14 +30,16 @@ export default function AnimalsListContainer({ viewType }: AnimalsListContainerP
         return <p>Error!</p>;
     }
 
-    if (!data?.animals.length) {
+    if (!data?.animals?.edges.length) {
         // TODO: replace with proper UI elements
         return <p>No data</p>;
     }
 
+    setAnimalsCount(data?.animals.pageInfo.totalCount);
+
     if (viewType === AnimalsViewType.TABLE) {
-        return <AnimalsTable animals={data.animals} />;
+        return <AnimalsTable animals={data.animals.edges} />;
     }
 
-    return <AnimalsList animals={data.animals} />;
+    return <AnimalsList animals={data.animals.edges} />;
 }

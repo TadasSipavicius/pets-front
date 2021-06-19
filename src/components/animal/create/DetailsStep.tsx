@@ -11,6 +11,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Species } from '../../../graphql/types';
 import DynamicSelector from '../../form/DynamicSelector';
 import TextInput from '../../form/TextInput';
+import RichTextEditor from './RichTextEditor';
 
 const GET_SPECIES = loader('../../../graphql/queries/species.graphql');
 const GET_GENDERS = loader('../../../graphql/queries/genders.graphql');
@@ -18,7 +19,7 @@ const GET_BREEDS = loader('../../../graphql/queries/breeds.graphql');
 const GET_COLORS = loader('../../../graphql/queries/colors.graphql');
 const GET_STATUSES = loader('../../../graphql/queries/statuses.graphql');
 
-function DetailsStep({ onNext }: DetailsStepProps) {
+function DetailsStep() {
     const classes = useStyles();
     const { control, setValue } = useFormContext();
     const history = useHistory();
@@ -34,7 +35,7 @@ function DetailsStep({ onNext }: DetailsStepProps) {
     }, [specie, setValue]);
 
     const handleCancel = () => {
-        history.push('/');
+        history.push('/animal-list');
     };
 
     return (
@@ -62,7 +63,7 @@ function DetailsStep({ onNext }: DetailsStepProps) {
                 <Grid item xs={12} sm={6}>
                     <DynamicSelector
                         name="details.breed"
-                        label="Gender"
+                        label="Breed"
                         disabled={!specie}
                         gqlOptions={{
                             query: GET_BREEDS,
@@ -91,17 +92,10 @@ function DetailsStep({ onNext }: DetailsStepProps) {
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                    <TextInput name="imageUrl" label="Image URL" id="imageUrl" fullWidth />
+                    <TextInput type="file" name="image" id="image" fullWidth />
                 </Grid>
                 <Grid item xs={12} className={classes.relative}>
-                    <TextInput
-                        name="description"
-                        label="Description"
-                        id="description"
-                        fullWidth
-                        showLettersCount
-                        maxLength={200}
-                    />
+                    <RichTextEditor name="description" maxLength={200} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <DynamicSelector
@@ -111,12 +105,6 @@ function DetailsStep({ onNext }: DetailsStepProps) {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextInput name="details.weight" id="weight" label="Weight, kg" type="number" fullWidth />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextInput name="details.allergy" id="allergy" label="Allergy" fullWidth />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextInput name="details.food" id="food" label="Food" fullWidth />
                 </Grid>
             </Grid>
             <Grid item container>
@@ -129,8 +117,8 @@ function DetailsStep({ onNext }: DetailsStepProps) {
                     </Button>
                 </Grid>
                 <Grid item>
-                    <Button color="secondary" variant="contained" onClick={onNext}>
-                        Next
+                    <Button type="submit" color="secondary" variant="contained">
+                        Submit
                     </Button>
                 </Grid>
             </Grid>
@@ -154,7 +142,3 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default memo(DetailsStep);
-
-interface DetailsStepProps {
-    onNext: () => void;
-}
